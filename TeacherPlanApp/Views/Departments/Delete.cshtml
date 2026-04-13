@@ -1,0 +1,21 @@
+@model TeacherPlanApp.Models.Department
+
+<div class="container mt-4">
+    <h2 class="text-danger">Удаление кафедры</h2>
+    <h3>Вы уверены, что хотите удалить эту кафедру?</h3>
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">ID:</dt>
+            <dd class="col-sm-10">@Model.Id</dd>
+            <dt class="col-sm-2">Название:</dt>
+            <dd class="col-sm-10">@Model.Name</dd>
+        </dl>
+        
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Удалить безвозвратно" class="btn btn-danger" /> 
+            <a asp-action="Index" class="btn btn-secondary ms-2">Отмена</a>
+        </form>
+    </div>
+</div>
