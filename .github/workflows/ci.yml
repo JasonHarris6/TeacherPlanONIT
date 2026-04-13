@@ -1,0 +1,55 @@
+name: CI/CD Pipeline
+
+# Запускать пайплайн при каждом push в ветку main
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    # Поднимаем контейнер с PostgreSQL прямо в GitHub Actions для наших тестов
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    # 1. Клонируем наш код из репозитория
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    # 2. Устанавливаем .NET 10
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '10.0.x'
+        
+    # 3. Восстанавливаем зависимости
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    # 4. Собираем проект
+    - name: Build project
+      run: dotnet build --no-restore
+      
+    # 5. Запускаем функциональные тесты и передаем секреты как переменные окружения
+    - name: Run Tests
+      run: dotnet test TeacherPlanApp.Tests --no-build --verbosity normal
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
