@@ -29,7 +29,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 // Включаем маршрут для проверки здоровья (Docker будет дергать эту ссылку)
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/error");
 
 app.MapControllerRoute(
     name: "default",
